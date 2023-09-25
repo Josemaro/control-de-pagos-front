@@ -1,6 +1,8 @@
 import React from "react";
 
 import {
+  Accordion,
+  AccordionItem,
   Table,
   TableHeader,
   TableColumn,
@@ -46,7 +48,6 @@ function ControlPagos() {
   });
   const [page, setPage] = React.useState(1);
 
-  const pages = Math.ceil(pagos.length / rowsPerPage);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -57,21 +58,23 @@ function ControlPagos() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredUsers = [...pagos];
+    let filteredPagos = [...pagos];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.siaf.toLowerCase().includes(filterValue.toLowerCase()),
+      filteredPagos = filteredPagos.filter((pago) =>
+        pago.siaf.toLowerCase().includes(filterValue.toLowerCase()),
       );
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.mes),
+      filteredPagos = filteredPagos.filter((pago) =>
+        Array.from(statusFilter).includes(pago.mes),
       );
     }
 
-    return filteredUsers;
+    return filteredPagos;
   }, [pagos, filterValue, statusFilter]);
+
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -90,19 +93,19 @@ function ControlPagos() {
     });
   }, [sortDescriptor, items]);
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = React.useCallback((pago, columnKey) => {
+    const cellValue = pago[columnKey];
 
     switch (columnKey) {
       case "responsable":
         return (
           <User
-            avatarProps={{ radius: "full", size: "sm", src: user.avatar }}
+            avatarProps={{ radius: "full", size: "sm", src: pago.avatar }}
             classNames={{
               description: "text-default-500",
             }}
             className="whitespace-nowrap"
-            // description={user.email}
+            // description={pago.email}
             name={cellValue}
           >
             {cellValue}
@@ -112,14 +115,14 @@ function ControlPagos() {
         return (
           <div className="flex flex-col">
             <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-500">{user.team}</p>
+            <p className="text-bold text-tiny capitalize text-default-500">{pago.team}</p>
           </div>
         );
       case "status":
         return (
           <Chip
             className="capitalize border-none gap-1 text-default-600"
-            color={statusColorMap[user.status]}
+            color={statusColorMap[pago.status]}
             size="sm"
             variant="dot"
           >
@@ -178,97 +181,105 @@ function ControlPagos() {
   const topContent = React.useMemo(() => {
     return (
       <div className="sticky left-0">
-        <div className="flex flex-col gap-4">
-          <div className="flex justify-between gap-3 items-end">
-            <Input
-              isClearable
-              classNames={{
-                base: "w-full sm:max-w-[44%]",
-                inputWrapper: "border-1",
-              }}
-              placeholder="Buscar..."
-              size="sm"
-              startContent={<SearchIcon className="text-default-300" />}
-              value={filterValue}
-              variant="bordered"
-              onClear={() => setFilterValue("")}
-              onValueChange={onSearchChange}
-            />
-            <div className="flex gap-3">
-              <Dropdown>
-                <DropdownTrigger className="hidden sm:flex">
-                  <Button
-                    endContent={<ChevronDownIcon className="text-small" />}
+        <div>
+          <Accordion defaultExpandedKeys={["1"]}>
+            <AccordionItem key="1" aria-label="Búsqueda avanzada" subtitle="Haz click aquí para acceder a los filtros" title="Pagos">
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-between gap-3 items-end">
+                  <Input
+                    isClearable
+                    classNames={{
+                      base: "w-full sm:max-w-[44%]",
+                      inputWrapper: "border-1",
+                    }}
+                    placeholder="Buscar..."
                     size="sm"
-                    variant="flat"
-                  >
-                    Meses
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  disallowEmptySelection
-                  aria-label="Table Columns"
-                  closeOnSelect={false}
-                  selectedKeys={statusFilter}
-                  selectionMode="multiple"
-                  onSelectionChange={setStatusFilter}
-                >
-                  {statusOptions.map((status) => (
-                    <DropdownItem key={status.uid} className="capitalize">
-                      {capitalize(status.name)}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-              <Dropdown>
-                <DropdownTrigger className="hidden sm:flex">
-                  <Button
-                    endContent={<ChevronDownIcon className="text-small" />}
-                    size="sm"
-                    variant="flat"
-                  >
-                    Columnas
-                  </Button>
-                </DropdownTrigger>
-                <DropdownMenu
-                  disallowEmptySelection
-                  aria-label="Table Columns"
-                  closeOnSelect={false}
-                  selectedKeys={visibleColumns}
-                  selectionMode="multiple"
-                  onSelectionChange={setVisibleColumns}
-                >
-                  {columns.map((column) => (
-                    <DropdownItem key={column.uid} className="capitalize">
-                      {capitalize(column.name)}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              </Dropdown>
-              <Button
-                className="bg-foreground text-background"
-                endContent={<PlusIcon />}
-                size="sm"
-              >
-                Registrar
-              </Button>
-            </div>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-default-400 text-small">{pagos.length} resultados</span>
-            <label className="flex items-center text-default-400 text-small">
-              Elementos por página:
-              <select
-                className="bg-transparent outline-none text-default-400 text-small"
-                onChange={onRowsPerPageChange}
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="15">15</option>
-              </select>
-            </label>
-          </div>
+                    startContent={<SearchIcon className="text-default-300" />}
+                    value={filterValue}
+                    variant="bordered"
+                    onClear={() => setFilterValue("")}
+                    onValueChange={onSearchChange}
+                  />
+                  <div className="flex gap-3">
+                    <Dropdown>
+                      <DropdownTrigger className="hidden sm:flex">
+                        <Button
+                          endContent={<ChevronDownIcon className="text-small" />}
+                          size="sm"
+                          variant="flat"
+                        >
+                          Meses
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        disallowEmptySelection
+                        aria-label="Table Columns"
+                        closeOnSelect={false}
+                        selectedKeys={statusFilter}
+                        selectionMode="multiple"
+                        onSelectionChange={setStatusFilter}
+                      >
+                        {statusOptions.map((status) => (
+                          <DropdownItem key={status.uid} className="capitalize">
+                            {capitalize(status.name)}
+                          </DropdownItem>
+                        ))}
+                      </DropdownMenu>
+                    </Dropdown>
+                    <Dropdown>
+                      <DropdownTrigger className="hidden sm:flex">
+                        <Button
+                          endContent={<ChevronDownIcon className="text-small" />}
+                          size="sm"
+                          variant="flat"
+                        >
+                          Columnas
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        disallowEmptySelection
+                        aria-label="Table Columns"
+                        closeOnSelect={false}
+                        selectedKeys={visibleColumns}
+                        selectionMode="multiple"
+                        onSelectionChange={setVisibleColumns}
+                      >
+                        {columns.map((column) => (
+                          <DropdownItem key={column.uid} className="capitalize">
+                            {capitalize(column.name)}
+                          </DropdownItem>
+                        ))}
+                      </DropdownMenu>
+                    </Dropdown>
+                    <Button
+                      className="bg-foreground text-background"
+                      endContent={<PlusIcon />}
+                      size="sm"
+                    >
+                      Registrar
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-default-400 text-small">{filteredItems.length} resultados</span>
+                  <label className="flex items-center text-default-400 text-small">
+                    Elementos por página:
+                    <select
+                      className="bg-transparent outline-none text-default-400 text-small"
+                      onChange={onRowsPerPageChange}
+                      defaultValue={10}
+                    >
+                      <option value="5">5</option>
+                      <option value="10">10</option>
+                      <option value="15">15</option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+            </AccordionItem>
+          </Accordion>
         </div>
+
       </div>
     );
   }, [
@@ -291,7 +302,7 @@ function ControlPagos() {
               cursor: "bg-foreground text-background",
             }}
             color="default"
-            isDisabled={hasSearchFilter}
+            // isDisabled={hasSearchFilter}
             page={page}
             total={pages}
             variant="light"
@@ -363,7 +374,7 @@ function ControlPagos() {
         </TableHeader>
         <TableBody emptyContent={"Sin pagos encontrados"} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.id}>
+            <TableRow key={item.id} className="cursor-pointer">
               {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
             </TableRow>
           )}

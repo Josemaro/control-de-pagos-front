@@ -27,6 +27,7 @@ export default function LoginModal({ setUsuario, usuario }) {
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         placement="top-center"
+        backdrop="blur"
       >
         <ModalContent>
           {(onClose) => (
