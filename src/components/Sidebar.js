@@ -36,7 +36,7 @@ export default function SidebarWithContentSeparator({ setUsuario, usuario }) {
   };
 
   return (
-    <Card className="h-[calc(100vh-1rem)] w-full p-4 shadow-xl shadow-gray-900/10 ">
+    <Card className="h-[calc(100vh-1rem)] w-[100%] p-4 shadow-xl shadow-gray-900/10 ">
       <div className="mb-2 p-4 flex flex-col items-center gap-2">
         <img
           // onClick={() => goTo("/inicio")}

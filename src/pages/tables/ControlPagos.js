@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import {
   Accordion,
@@ -11,6 +11,7 @@ import {
   TableCell,
   Input,
   Button,
+  Divider,
   DropdownTrigger,
   Dropdown,
   DropdownMenu,
@@ -22,8 +23,10 @@ import {
 import { PlusIcon } from "../../assets/PlusIcon";
 import { VerticalDotsIcon } from "../../assets/VerticalDotsIcon";
 import { SearchIcon } from "../../assets/SearchIcon";
+import { useNavigate } from "react-router";
+import axios from "axios";
 import { ChevronDownIcon } from "../../assets/ChevronDownIcon";
-import { columns, pagos, statusOptions } from "../../data/pagos";
+import { columns, statusOptions } from "../../data/pagos";
 import { capitalize } from "../../utils/utils";
 import { Typography } from "@material-tailwind/react";
 
@@ -34,20 +37,24 @@ const statusColorMap = {
   vacation: "warning",
 };
 
-const INITIAL_VISIBLE_COLUMNS = ["id", "mes", "fecha", "cut", "orden", "siaf", "tipodoc", "nro", "ftefto", "monto", "ausuaria", "frecepcion", "proveedor", "clasificador", "responsable", "tdorden"];
+const INITIAL_VISIBLE_COLUMNS = ["id", "mes", "fecha", "cut", "orden", "siaf", "tipoDocumento", "nro", "ftefto", "monto", "area_usuaria", "fecha_recepcion", "nombreProveedor", "clasificador", "responsableControlPrevio", "tdorden"];
 
 function ControlPagos() {
+  const navigate = useNavigate();
+  const baseURL = process.env.REACT_APP_HOST + "/pagos";
+  const [data, setData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
-  const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
+  // const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
+  const [visibleColumns, setVisibleColumns] = React.useState("all");
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "age",
-    direction: "ascending",
+    // column: "id",
+    // direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -58,7 +65,10 @@ function ControlPagos() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredPagos = [...pagos];
+    let filteredPagos = [];
+    if (data.content?.length) {
+      filteredPagos = [...data.content];
+    }
 
     if (hasSearchFilter) {
       filteredPagos = filteredPagos.filter((pago) =>
@@ -72,7 +82,7 @@ function ControlPagos() {
     }
 
     return filteredPagos;
-  }, [pagos, filterValue, statusFilter]);
+  }, [filterValue, statusFilter, data.content]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -81,7 +91,7 @@ function ControlPagos() {
     const end = start + rowsPerPage;
 
     return filteredItems.slice(start, end);
-  }, [page, filteredItems, rowsPerPage]);
+  }, [page, filteredItems, rowsPerPage, data.content]);
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a, b) => {
@@ -93,12 +103,29 @@ function ControlPagos() {
     });
   }, [sortDescriptor, items]);
 
+
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+
   const renderCell = React.useCallback((pago, columnKey) => {
     const cellValue = pago[columnKey];
 
     switch (columnKey) {
-      case "responsable":
+      case "responsableControlPrevio":
         return (
+          // <div>
+          //   {pago.responsableControlPrevio}
+          // </div>
           <User
             avatarProps={{ radius: "full", size: "sm", src: pago.avatar }}
             classNames={{
@@ -106,7 +133,7 @@ function ControlPagos() {
             }}
             className="whitespace-nowrap"
             // description={pago.email}
-            name={cellValue}
+            name={pago.responsableControlPrevio}
           >
             {cellValue}
           </User>
@@ -129,7 +156,8 @@ function ControlPagos() {
             {cellValue}
           </Chip>
         );
-      case "proveedor":
+      case "nombreProveedor":
+      case "region":
         return (
           <Typography className="whitespace-nowrap">
             {cellValue}
@@ -183,85 +211,103 @@ function ControlPagos() {
       <div className="sticky left-0">
         <div>
           <Accordion defaultExpandedKeys={["1"]}>
-            <AccordionItem key="1" aria-label="Búsqueda avanzada" subtitle="Haz click aquí para acceder a los filtros" title="Pagos">
+            <AccordionItem key="1" aria-label="Búsqueda avanzada" subtitle="Click aquí para más opciones" title="Pagos">
               <div className="flex flex-col gap-4">
                 <div className="flex justify-between gap-3 items-end">
-                  <Input
-                    isClearable
-                    classNames={{
-                      base: "w-full sm:max-w-[44%]",
-                      inputWrapper: "border-1",
-                    }}
-                    placeholder="Buscar..."
-                    size="sm"
-                    startContent={<SearchIcon className="text-default-300" />}
-                    value={filterValue}
-                    variant="bordered"
-                    onClear={() => setFilterValue("")}
-                    onValueChange={onSearchChange}
-                  />
-                  <div className="flex gap-3">
-                    <Dropdown>
-                      <DropdownTrigger className="hidden sm:flex">
-                        <Button
-                          endContent={<ChevronDownIcon className="text-small" />}
-                          size="sm"
-                          variant="flat"
-                        >
-                          Meses
-                        </Button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        disallowEmptySelection
-                        aria-label="Table Columns"
-                        closeOnSelect={false}
-                        selectedKeys={statusFilter}
-                        selectionMode="multiple"
-                        onSelectionChange={setStatusFilter}
-                      >
-                        {statusOptions.map((status) => (
-                          <DropdownItem key={status.uid} className="capitalize">
-                            {capitalize(status.name)}
-                          </DropdownItem>
-                        ))}
-                      </DropdownMenu>
-                    </Dropdown>
-                    <Dropdown>
-                      <DropdownTrigger className="hidden sm:flex">
-                        <Button
-                          endContent={<ChevronDownIcon className="text-small" />}
-                          size="sm"
-                          variant="flat"
-                        >
-                          Columnas
-                        </Button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        disallowEmptySelection
-                        aria-label="Table Columns"
-                        closeOnSelect={false}
-                        selectedKeys={visibleColumns}
-                        selectionMode="multiple"
-                        onSelectionChange={setVisibleColumns}
-                      >
-                        {columns.map((column) => (
-                          <DropdownItem key={column.uid} className="capitalize">
-                            {capitalize(column.name)}
-                          </DropdownItem>
-                        ))}
-                      </DropdownMenu>
-                    </Dropdown>
-                    <Button
-                      className="bg-foreground text-background"
-                      endContent={<PlusIcon />}
+                  <div className="flex gap-3 sm:min-w-[50%]">
+                    {/* <Input
+                      isClearable
+                      classNames={{
+                        base: "w-full sm:max-w-[100%]",
+                        inputWrapper: "border-1",
+                      }}
+                      placeholder="Buscar..."
                       size="sm"
-                    >
-                      Registrar
-                    </Button>
+                      startContent={<SearchIcon className="text-default-300" />}
+                      value={filterValue}
+                      variant="bordered"
+                      onClear={() => setFilterValue("")}
+                      onValueChange={onSearchChange}
+                    />
+                    <Button size="sm">
+                      Small
+                    </Button> */}
+                    <div className="flex gap-3">
+                      <Dropdown>
+                        <DropdownTrigger className="hidden sm:flex">
+                          <Button
+                            endContent={<ChevronDownIcon className="text-small" />}
+                            size="sm"
+                            variant="flat"
+                          >
+                            Meses
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                          disallowEmptySelection
+                          aria-label="Table Columns"
+                          closeOnSelect={false}
+                          selectedKeys={statusFilter}
+                          selectionMode="multiple"
+                          onSelectionChange={setStatusFilter}
+                        >
+                          {statusOptions.map((status) => (
+                            <DropdownItem key={status.uid} className="capitalize">
+                              {capitalize(status.name)}
+                            </DropdownItem>
+                          ))}
+                        </DropdownMenu>
+                      </Dropdown>
+                      <Dropdown>
+                        <DropdownTrigger className="hidden sm:flex">
+                          <Button
+                            endContent={<ChevronDownIcon className="text-small" />}
+                            size="sm"
+                            variant="flat"
+                          >
+                            Columnas
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                          disallowEmptySelection
+                          aria-label="Table Columns"
+                          closeOnSelect={false}
+                          selectedKeys={visibleColumns}
+                          selectionMode="multiple"
+                          onSelectionChange={setVisibleColumns}
+                        >
+                          {columns.map((column) => (
+                            <DropdownItem key={column.uid} className="capitalize">
+                              {capitalize(column.name)}
+                            </DropdownItem>
+                          ))}
+                        </DropdownMenu>
+                      </Dropdown>
+                      <Button
+                        className="bg-foreground text-background"
+                        endContent={<PlusIcon />}
+                        size="sm"
+                      >
+                        Registrar
+                      </Button>
+                    </div>
+                    {/*                    
+                    <div className="flex flex-col gap-2">
+                      <div className="flex w-full flex-wrap items-end md:flex-nowrap mb-6 md:mb-0 gap-4">
+                        <Input
+                          key="iSiaf"
+                          type="text"
+                          label="SIAF"
+                          labelPlacement="outside-left"
+                          placeholder="Ingresa N° SIAF"
+                        />
+                      </div>
+                    </div> */}
                   </div>
+
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-default-400 text-small">{filteredItems.length} resultados</span>
+                  <span className="text-default-400 text-small">{data.content?.length} resultados</span>
                   <label className="flex items-center text-default-400 text-small">
                     Elementos por página:
                     <select
@@ -288,31 +334,50 @@ function ControlPagos() {
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    pagos.length,
     hasSearchFilter,
   ]);
 
   const bottomContent = React.useMemo(() => {
     return (
       <div className="sticky left-0">
-        <div className="py-2 px-2 flex justify-between items-center">
-          <Pagination
-            showControls
-            classNames={{
-              cursor: "bg-foreground text-background",
-            }}
-            color="default"
-            // isDisabled={hasSearchFilter}
-            page={page}
-            total={pages}
-            variant="light"
-            onChange={setPage}
-          />
-          {/* <span className="text-small text-default-400">
-            {selectedKeys === "all"
-              ? "All items selected"
-              : `${selectedKeys.size} of ${items.length} selected`}
-          </span> */}
+        <div className="py-2 px-2 flex items-center">
+          <div className="w-[100%] flex gap-6">
+            <Pagination
+              // showControls
+              classNames={{
+                cursor: "bg-foreground text-background",
+              }}
+              color="default"
+              // isDisabled={hasSearchFilter}
+              page={page}
+              total={pages}
+              variant="light"
+              onChange={setPage}
+              key="lg"
+              initialPage={page}
+              siblings={2}
+            />
+            <div className="flex gap-2">
+              <Button isDisabled={page === 1} size="sm" variant="flat" onPress={onPreviousPage}>
+                Anterior
+              </Button>
+              <Button isDisabled={pages === page} size="sm" variant="flat" onPress={onNextPage}>
+                Siguiente
+              </Button>
+            </div>
+          </div>
+          <div className="flex w-[100%] justify-end">
+            <span className="text-small text-default-400">
+              {
+                selectedKeys.currentKey ? `Registro con ID ${selectedKeys.currentKey} Seleccionado` : ""
+              }
+              {/* {selectedKeys === "all"
+                ? "Todos los elementos seleccionados"
+                : `Registro con ID ${selectedKeys.currentKey} Seleccionado`
+                //  ` ${JSON.stringify(selectedKeys)} of ${items.length} selected`
+              } */}
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -337,6 +402,25 @@ function ControlPagos() {
     [],
   );
 
+  useEffect(() => {
+    // Verificar si ya tenemos los datos en el estado local antes de realizar una nueva solicitud.
+    if (data.length === 0) {
+      const params = {
+        size: 10000
+      }
+      // Realizar una solicitud GET solo si los datos aún no están cargados.
+      axios.get(baseURL, { params })
+        .then(response => {
+          setData(response.data);
+          setIsLoading(false);
+        })
+        .catch(error => {
+          console.error('Error al obtener los datos:', error);
+        });
+    }
+  }, []);
+
+
   return (
     <>
       <Table
@@ -358,6 +442,7 @@ function ControlPagos() {
         topContentPlacement="outside"
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
+        color={"warning"}
         // style={{ background: "aqua" }}
         className="controlPagosTabla overflow-y-hidden"
       >
@@ -372,7 +457,7 @@ function ControlPagos() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"Sin pagos encontrados"} items={sortedItems}>
+        <TableBody isLoading={isLoading} emptyContent={"Sin pagos encontrados"} items={sortedItems}>
           {(item) => (
             <TableRow key={item.id} className="cursor-pointer">
               {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -380,6 +465,8 @@ function ControlPagos() {
           )}
         </TableBody>
       </Table>
+      <Divider className="my-4" />
+      {/* {JSON.stringify(sortedItems)} */}
     </>
   );
 }

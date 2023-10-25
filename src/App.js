@@ -14,11 +14,11 @@ function App() {
 
   return (
     <>
-      <div className='flex flex-row gap-2'>
-        <div className='flex w-2/12 min-w-[16.666667%] max-w-[16.666667%]'>
+      <div className='flex flex-row gap-2 '>
+        <div className='flex w-2/12 min-w-[15%] max-w-[15%]'>
           <SidebarWithContentSeparator setUsuario={setUsuario} usuario={usuario} />
         </div>
-        <div className='flex-grow-1 w-10/12 h-auto'>
+        <div className='flex-grow-1 min-w-[85%] max-w-[85%] h-auto'>
           <Card className='h-full p-4'>
             <Routes>
               <Route path="*" element={<Navigate to="/pagos" />} />
