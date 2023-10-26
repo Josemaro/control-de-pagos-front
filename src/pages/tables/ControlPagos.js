@@ -37,12 +37,70 @@ const statusColorMap = {
   vacation: "warning",
 };
 
+const pagoDto = {
+  "id": "",
+  "cut": "",
+  "fecha": "",
+  "tipoDocumento": "",
+  "nro": "",
+  "ftefto": "",
+  "monto": "",
+  "areaUsuaria": "",
+  "fechaRecepcion": "",
+  "nombreProveedor": "",
+  "orden": "",
+  "siaf": "",
+  "clasificador": "",
+  "responsableControlPrevio": "",
+  "tipoOrdenServicioCompra": "",
+  "region": "",
+  "ruc": "",
+  "comprobante": "",
+  "nroDocumento": "",
+  "fechaEmision": "",
+  "penalidad": "",
+  "montoPenalidad": "",
+  "numeroPago": "",
+  "observacionPagos": "",
+  "estadoDocumento": "",
+  "fechaEntregaContabilidad": "",
+  "ultimaModificacion": "",
+  "fechaContabilidad_1": "",
+  "fechaContabilidad_2": "",
+  "estadoControlPrevio": "",
+  "responsableContabilidad": "",
+  "comprobanteContabilidad": "",
+  "montoContabilidad": "",
+  "retencionContabilidad": "",
+  "detraccionContabilidad": "",
+  "penalidadContabilidad": "",
+  "situacionExpediente": "",
+  "porRevisar": "",
+  "estadoDevengadoSiaf": "",
+  "tipoObservacion": "",
+  "concepto": "",
+  "areaCorrige": "",
+  "fechaEntrega": "",
+  "fechaDevolucion": "",
+  "estadoValidacion": "",
+  "fechaDevengado": "",
+  "montoDevengadoAprobado": "",
+  "verificaRepeticion": "",
+  "validaSiaf": "",
+  "comprobantePagoTesoreria": "",
+  "montoTotalCps": "",
+  "observacion": "",
+  "ubicacion": ""
+}
+
 const INITIAL_VISIBLE_COLUMNS = ["id", "mes", "fecha", "cut", "orden", "siaf", "tipoDocumento", "nro", "ftefto", "monto", "area_usuaria", "fecha_recepcion", "nombreProveedor", "clasificador", "responsableControlPrevio", "tdorden"];
 
 function ControlPagos() {
   const navigate = useNavigate();
   const baseURL = process.env.REACT_APP_HOST + "/pagos";
   const [data, setData] = useState([]);
+  const [pagoSeleccionado, setPagoSeleccionado] = useState(pagoDto);
+  const [camposModificacion, setCamposModificacion] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState(new Set([]));
@@ -158,12 +216,13 @@ function ControlPagos() {
         );
       case "nombreProveedor":
       case "region":
-        return (
-          <Typography className="whitespace-nowrap">
-            {cellValue}
-          </Typography>
-        );
-      case "responsable1":
+      case "observacionPagos":
+      case "concepto":
+      case "fechaEmision":
+      case "fechaContabilidad_1":
+      case "fechaContabilidad_2":
+      case "observacion":
+      case "nroDocumento":
         return (
           <Typography className="whitespace-nowrap">
             {cellValue}
@@ -258,7 +317,7 @@ function ControlPagos() {
                           ))}
                         </DropdownMenu>
                       </Dropdown>
-                      <Dropdown>
+                      <Dropdown shouldBlockScroll={false}>
                         <DropdownTrigger className="hidden sm:flex">
                           <Button
                             endContent={<ChevronDownIcon className="text-small" />}
@@ -269,6 +328,7 @@ function ControlPagos() {
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu
+                          autoFocus={false}
                           disallowEmptySelection
                           aria-label="Table Columns"
                           closeOnSelect={false}
@@ -325,7 +385,6 @@ function ControlPagos() {
             </AccordionItem>
           </Accordion>
         </div>
-
       </div>
     );
   }, [
@@ -353,7 +412,7 @@ function ControlPagos() {
               total={pages}
               variant="light"
               onChange={setPage}
-              key="lg"
+              // key="lg"
               initialPage={page}
               siblings={2}
             />
@@ -420,6 +479,23 @@ function ControlPagos() {
     }
   }, []);
 
+  useEffect(() => {
+    // Verificar si ya tenemos los datos en el estado local antes de realizar una nueva solicitud.
+    if (selectedKeys.currentKey != null) {
+      // Realizar una solicitud GET solo si los datos aún no están cargados.
+      axios.get(baseURL + '/' + selectedKeys.currentKey)
+        .then(response => {
+          setPagoSeleccionado(response.data);
+          setCamposModificacion({})
+          console.log(response.data)
+        })
+        .catch(error => {
+          setCamposModificacion({})
+          console.error('Error al obtener los datos:', error);
+        });
+    }
+  }, [selectedKeys]);
+  const variants = ["flat", "bordered", "underlined", "faded"];
 
   return (
     <>
@@ -427,7 +503,7 @@ function ControlPagos() {
         isCompact
         removeWrapper
         aria-label="Tabla control de pagos"
-        bottomContent={bottomContent}
+        bottomContent={pages > 0 && bottomContent}
         bottomContentPlacement="outside"
         checkboxesProps={{
           classNames: {
@@ -467,6 +543,59 @@ function ControlPagos() {
       </Table>
       <Divider className="my-4" />
       {/* {JSON.stringify(sortedItems)} */}
+      <div className="flex gap-4">
+        <div className="w-3/12">
+          <div className="w-full flex flex-col gap-4">
+            <div key="iid" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.id} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, id: e.target.value }) }} id="inputId" label="ID" placeholder="ID" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+            <div key="iSIAF" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.siaf} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, siaf: e.target.value }); setCamposModificacion({...camposModificacion, siaf: e.target.value}) }} id="inputSIAF" label="SIAF" placeholder="Ingresar SIAF" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+            <div key="iOrden" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.orden} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, orden: e.target.value }); setCamposModificacion({...camposModificacion, orden: e.target.value})  }} id="inputOrden" label="Orden" placeholder="Ingresar Orden" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+          </div>
+        </div>
+        <Divider orientation="vertical" />
+        <div className="w-3/12">
+          <div className="w-full flex flex-col gap-4">
+            <div key="iNro" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.nro} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, nro: e.target.value }) }} id="inputNro" label="N°" placeholder="Ingresar N°" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+            <div key="CUT" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.cut} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, cut: e.target.cut }); setCamposModificacion({...camposModificacion, cut: e.target.value})  }} id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+            <div key="Orden" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input id="Orden" label="Orden" placeholder="Ingresar Orden" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+          </div>
+        </div>
+        <Divider orientation="vertical" />
+        <div className="w-3/12">
+          <div className="w-full flex flex-col gap-4">
+            {JSON.stringify(camposModificacion)}
+          </div>
+        </div>
+
+        {/* <Divider orientation="vertical"/>
+        <div className="w-3/12">
+          <div className="w-full flex flex-col gap-4">
+            <div key="CUT" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+            <div key="Orden" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input id="Orden" label="Orden" placeholder="Ingresar Orden" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+            <div key="SIAF" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input id="SIAF" label="SIAF" placeholder="Ingresar SIAF" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+            <div key="email" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            </div>
+          </div>
+        </div> */}
+      </div>
     </>
   );
 }

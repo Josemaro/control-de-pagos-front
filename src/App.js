@@ -14,7 +14,7 @@ function App() {
 
   return (
     <>
-      <div className='flex flex-row gap-2 '>
+      <div className='flex flex-row gap-2 overflow-x-hidden'>
         <div className='flex w-2/12 min-w-[15%] max-w-[15%]'>
           <SidebarWithContentSeparator setUsuario={setUsuario} usuario={usuario} />
         </div>

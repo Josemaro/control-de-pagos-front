@@ -59,7 +59,7 @@ export default function SidebarWithContentSeparator({ setUsuario, usuario }) {
       }
 
 
-      <List>
+      <List className="min-w-[120px]">
         <Accordion
           open={open === 1}
           icon={
@@ -69,12 +69,12 @@ export default function SidebarWithContentSeparator({ setUsuario, usuario }) {
             />
           }
         >
-          <ListItem className="p-0" selected={open === 1}>
+          <ListItem className="p-0 min-w-[120px]" selected={open === 1}>
             <AccordionHeader onClick={() => handleOpen(1)} className="border-b-0 p-3">
               <ListItemPrefix>
                 <PresentationChartBarIcon className="h-5 w-5" />
               </ListItemPrefix>
-              <Typography color="black" className="mr-auto font-normal">
+              <Typography color="black" className="mr-auto font-normal overflow-hidden">
                 Dashboard
               </Typography>
             </AccordionHeader>
@@ -90,7 +90,7 @@ export default function SidebarWithContentSeparator({ setUsuario, usuario }) {
                 Métricas
               </ListItem>
               <ListItem
-              disabled
+                disabled
                 onClick={() => { goTo("/reportes") }}
               >
                 <ListItemPrefix>
@@ -110,18 +110,18 @@ export default function SidebarWithContentSeparator({ setUsuario, usuario }) {
             />
           }
         >
-          <ListItem className="p-0" selected={open === 2}>
+          <ListItem className="p-0 min-w-[120px]" selected={open === 2}>
             <AccordionHeader onClick={() => handleOpen(2)} className="border-b-0 p-3">
               <ListItemPrefix>
                 <TableCellsIcon className="h-5 w-5" />
               </ListItemPrefix>
-              <Typography color="black" className="mr-auto font-normal">
+              <Typography color="black" className="mr-auto font-normal  overflow-hidden">
                 Tableros
               </Typography>
             </AccordionHeader>
           </ListItem>
           <AccordionBody className="py-1">
-            <List className="p-0">
+            <List className="p-0 min-w-[120px]">
               <ListItem
                 onClick={() => { goTo("/pagos") }}
               >

@@ -20,8 +20,31 @@ const columns = [
 	{ name: "REGION", uid: "region", sortable: true },
 	{ name: "RUC", uid: "ruc", sortable: true },
 	{ name: "COMPROBANTE", uid: "comprobante", sortable: true },
-	{ name: "N° DE DOCUMENTO", uid: "nrodocumento", sortable: true },
-	
+	{ name: "N° DE DOCUMENTO", uid: "nroDocumento", sortable: true },
+	{ name: "FECHA DE EMISIÓN", uid: "fechaEmision", sortable: true },
+	{ name: "N° PAGO", uid: "numeroPago", sortable: true },
+	{ name: "OBSERVACION PAGO", uid: "observacionPagos", sortable: true },
+	{ name: "ESTADO DOCUMENTO", uid: "estadoDocumento", sortable: true },
+	{ name: "FECHA ENTREGA CONTABILIDAD", uid: "fechaEntregaContabilidad", sortable: true },
+	{ name: "FECHA 1", uid: "fechaContabilidad_1", sortable: true },
+	{ name: "FECHA 2", uid: "fechaContabilidad_2", sortable: true },
+	{ name: "MONTO CONTABILIDAD", uid: "montoContabilidad", sortable: true },
+	{ name: "RETENCIÓN", uid: "retencionContabilidad", sortable: true },
+	{ name: "DETRACCIÓN", uid: "detraccionContabilidad", sortable: true },
+	{ name: "PENALIDAD", uid: "penalidadContabilidad", sortable: true },
+	{ name: "SITUACIÓN EXPEDIENTE", uid: "situacionExpediente", sortable: true },
+	{ name: "POR REVISAR", uid: "porRevisar", sortable: true },
+	{ name: "ESTADO DEVENGADO EN SIAF", uid: "estadoDevengadoSiaf", sortable: true },
+	{ name: "TIPO DE OBSERVACIÓN", uid: "tipoObservacion", sortable: true },
+	{ name: "CONCEPTO", uid: "concepto", sortable: true },
+	// TODO ESTADO VALIDACION
+	{ name: "ESTADO VALIDACION", uid: "estadoValidacion", sortable: true },
+	{ name: "FECHA DE DEVENGADO", uid: "fechaDevengado", sortable: true },
+	{ name: "MONTO DEVENGADO APROBADO", uid: "montoDevengadoAprobado", sortable: true },
+	{ name: "VALIDACION SIAF", uid: "validaSiaf", sortable: true },
+	{ name: "COMPROBANTE DE PAGO TESORERIA", uid: "comprobantePagoTesoreria", sortable: true },
+	{ name: "MONTO TOTAL CPS", uid: "montoTotalCps", sortable: true },
+	{ name: "OBSERVACIÓN", uid: "observacion", sortable: true },
 
 ];
 
