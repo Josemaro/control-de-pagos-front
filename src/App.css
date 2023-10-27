@@ -6,3 +6,33 @@
     overflow-x: auto;
     white-space: nowrap;
 }
+/* div.h-full.flex.flex-col {
+    width: -webkit-fill-available;
+} */
+.detalleContenedor  div.h-full.flex.flex-col {
+    width: -webkit-fill-available;
+
+}
+
+.detalleContenedor label.text-foreground {
+    font-weight: 600;
+}
+
+.detalleContenedor {
+    border: 2px solid #d1f4e0;
+    box-shadow: 0px 5px 12px -9px;
+    border-radius: 20px;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+
+span.absolute.flex.text-small.rounded-medium.bg-foreground.text-background {
+    background-color: #12a150;
+    /* color: black; */
+}
+
+.usuariotabla .text-small.text-inherit{
+    font-size: 13px;
+}

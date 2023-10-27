@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 
 import { BrowserRouter } from 'react-router-dom';
-import {NextUIProvider} from "@nextui-org/react";
+import { NextUIProvider } from "@nextui-org/react";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -13,7 +13,10 @@ root.render(
   <React.StrictMode>
     <BrowserRouter>
       <NextUIProvider>
-        <App />
+        {/* <main className=" first-letter:text-foreground bg-background"> */}
+        <main className="dark text-foreground bg-background">
+          <App />
+        </main>
       </NextUIProvider>
     </BrowserRouter>
   </React.StrictMode>

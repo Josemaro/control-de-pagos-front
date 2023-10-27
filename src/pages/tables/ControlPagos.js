@@ -19,6 +19,7 @@ import {
   Chip,
   User,
   Pagination,
+  Skeleton
 } from "@nextui-org/react";
 import { PlusIcon } from "../../assets/PlusIcon";
 import { VerticalDotsIcon } from "../../assets/VerticalDotsIcon";
@@ -29,6 +30,7 @@ import { ChevronDownIcon } from "../../assets/ChevronDownIcon";
 import { columns, statusOptions } from "../../data/pagos";
 import { capitalize } from "../../utils/utils";
 import { Typography } from "@material-tailwind/react";
+import { useSearchParams } from 'react-router-dom';
 
 
 const statusColorMap = {
@@ -99,6 +101,7 @@ function ControlPagos() {
   const navigate = useNavigate();
   const baseURL = process.env.REACT_APP_HOST + "/pagos";
   const [data, setData] = useState([]);
+  const [isModifyFormLoaded, setModifyFormLoaded] = React.useState(false);
   const [pagoSeleccionado, setPagoSeleccionado] = useState(pagoDto);
   const [camposModificacion, setCamposModificacion] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -108,6 +111,7 @@ function ControlPagos() {
   const [visibleColumns, setVisibleColumns] = React.useState("all");
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [searchParams] = useSearchParams();
   const [sortDescriptor, setSortDescriptor] = React.useState({
     // column: "id",
     // direction: "ascending",
@@ -152,6 +156,7 @@ function ControlPagos() {
   }, [page, filteredItems, rowsPerPage, data.content]);
 
   const sortedItems = React.useMemo(() => {
+    //TODO CONSULTA ORDEN ASC DESC POR COLUMNA
     return [...items].sort((a, b) => {
       const first = a[sortDescriptor.column];
       const second = b[sortDescriptor.column];
@@ -186,10 +191,7 @@ function ControlPagos() {
           // </div>
           <User
             avatarProps={{ radius: "full", size: "sm", src: pago.avatar }}
-            classNames={{
-              description: "text-default-500",
-            }}
-            className="whitespace-nowrap"
+            className="whitespace-nowrap usuariotabla"
             // description={pago.email}
             name={pago.responsableControlPrevio}
           >
@@ -224,7 +226,7 @@ function ControlPagos() {
       case "observacion":
       case "nroDocumento":
         return (
-          <Typography className="whitespace-nowrap">
+          <Typography className="whitespace-nowrap" style={{fontSize:"small"}}>
             {cellValue}
           </Typography>
         );
@@ -367,7 +369,7 @@ function ControlPagos() {
 
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-default-400 text-small">{data.content?.length} resultados</span>
+                  <span className="text-default-400 text-small">{filteredItems.length} resultados</span>
                   <label className="flex items-center text-default-400 text-small">
                     Elementos por página:
                     <select
@@ -394,6 +396,7 @@ function ControlPagos() {
     onSearchChange,
     onRowsPerPageChange,
     hasSearchFilter,
+    data
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -480,14 +483,19 @@ function ControlPagos() {
   }, []);
 
   useEffect(() => {
+
     // Verificar si ya tenemos los datos en el estado local antes de realizar una nueva solicitud.
     if (selectedKeys.currentKey != null) {
+
+      setModifyFormLoaded(true)
+      setPagoSeleccionado(pagoDto);
+
       // Realizar una solicitud GET solo si los datos aún no están cargados.
       axios.get(baseURL + '/' + selectedKeys.currentKey)
         .then(response => {
           setPagoSeleccionado(response.data);
           setCamposModificacion({})
-          console.log(response.data)
+          setModifyFormLoaded(true)
         })
         .catch(error => {
           setCamposModificacion({})
@@ -518,7 +526,7 @@ function ControlPagos() {
         topContentPlacement="outside"
         onSelectionChange={setSelectedKeys}
         onSortChange={setSortDescriptor}
-        color={"warning"}
+        color={"success"}
         // style={{ background: "aqua" }}
         className="controlPagosTabla overflow-y-hidden"
       >
@@ -533,27 +541,33 @@ function ControlPagos() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody isLoading={isLoading} emptyContent={"Sin pagos encontrados"} items={sortedItems}>
+        <TableBody  isLoading={isLoading} emptyContent={"Sin pagos encontrados"} items={sortedItems}>
           {(item) => (
-            <TableRow key={item.id} className="cursor-pointer">
-              {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+            <TableRow key={item.id} className="cursor-pointer" >
+              {(columnKey) => <TableCell style={{fontSize:"small"}}>{renderCell(item, columnKey)}</TableCell>}
             </TableRow>
           )}
         </TableBody>
       </Table>
       <Divider className="my-4" />
       {/* {JSON.stringify(sortedItems)} */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 detalleContenedor" >
         <div className="w-3/12">
-          <div className="w-full flex flex-col gap-4">
+          <div className="w-full flex flex-col gap-4 ">
             <div key="iid" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input value={pagoSeleccionado.id} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, id: e.target.value }) }} id="inputId" label="ID" placeholder="ID" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              <Input isReadOnly={true} className="" value={pagoSeleccionado.id} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, id: e.target.value }) }} id="inputId" label="ID" placeholder="ID" labelPlacement="outside-left" type="text" size="xs" variant="Secondary" />
             </div>
             <div key="iSIAF" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input value={pagoSeleccionado.siaf} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, siaf: e.target.value }); setCamposModificacion({...camposModificacion, siaf: e.target.value}) }} id="inputSIAF" label="SIAF" placeholder="Ingresar SIAF" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              <Input value={pagoSeleccionado.siaf} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, siaf: e.target.value }); setCamposModificacion({ ...camposModificacion, siaf: e.target.value }) }} id="inputSIAF" label="SIAF" labelPlacement="outside-left" type="text" size="xs" variant="bordered" />
             </div>
             <div key="iOrden" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input value={pagoSeleccionado.orden} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, orden: e.target.value }); setCamposModificacion({...camposModificacion, orden: e.target.value})  }} id="inputOrden" label="Orden" placeholder="Ingresar Orden" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              <Input value={pagoSeleccionado.orden} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, orden: e.target.value }); setCamposModificacion({ ...camposModificacion, orden: e.target.value }) }} id="inputOrden" label="ÓRDEN" labelPlacement="outside-left" type="text" size="xs" variant="bordered" />
+            </div>
+            <div key="iFechaRecepcion" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.fechaRecepcion} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, fechaRecepcion: e.target.value }); setCamposModificacion({ ...camposModificacion, fechaRecepcion: e.target.value }) }} id="inputFechaRecepcion" label="FECHA DE RECEPCIÓN" labelPlacement="outside-left" type="text" size="xs" variant="bordered" />
+            </div>
+            <div key="iProveedor" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.nombreProveedor} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, nombreProveedor: e.target.value }); setCamposModificacion({ ...camposModificacion, nombreProveedor: e.target.value }) }} id="inputNombreProveedor" label="PROVEEDOR" labelPlacement="outside-left" type="text" size="xs" variant="bordered" fullWidth />
             </div>
           </div>
         </div>
@@ -561,40 +575,71 @@ function ControlPagos() {
         <div className="w-3/12">
           <div className="w-full flex flex-col gap-4">
             <div key="iNro" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input value={pagoSeleccionado.nro} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, nro: e.target.value }) }} id="inputNro" label="N°" placeholder="Ingresar N°" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              {/* <Skeleton className="w-4/5 rounded-lg" isLoaded={isModifyFormLoaded}> */}
+              <Input value={pagoSeleccionado.nro} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, nro: e.target.value }); setCamposModificacion({ ...camposModificacion, nro: e.target.value }) }} id="inputNro" label="N°" labelPlacement="outside-left" type="text" size="xs" variant="bordered" />
+              {/* </Skeleton> */}
             </div>
             <div key="CUT" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input value={pagoSeleccionado.cut} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, cut: e.target.cut }); setCamposModificacion({...camposModificacion, cut: e.target.value})  }} id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              {/* <Skeleton className="w-4/5 rounded-lg" isLoaded={isModifyFormLoaded}> */}
+              <Input value={pagoSeleccionado.cut} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, cut: e.target.value }); setCamposModificacion({ ...camposModificacion, cut: e.target.value }) }} id="CUT" label="CUT" labelPlacement="outside-left" type="text" size="xs" variant="bordered" />
+              {/* </Skeleton> */}
             </div>
-            <div key="Orden" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input id="Orden" label="Orden" placeholder="Ingresar Orden" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+            <div key="TipoDocumento" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.tipoDocumento} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, tipoDocumento: e.target.value }); setCamposModificacion({ ...camposModificacion, tipoDocumento: e.target.value }) }} id="TipoDocLabel" label="TIPO DE DOCUMENTO" labelPlacement="outside-left" type="text" size="xs" variant="bordered" />
+            </div>
+            <div key="fteFto" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.ftefto} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, ftefto: e.target.value }); setCamposModificacion({ ...camposModificacion, ftefto: e.target.value }) }} id="FteFtoLabel" label="FTE FTO RD -18 ROOC- 19 RO-00" labelPlacement="outside-left" type="text" size="xs" variant="bordered" />
+            </div>
+            <div key="monto" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.monto} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, monto: e.target.value }); setCamposModificacion({ ...camposModificacion, monto: e.target.value }) }} id="MontoLabel" label="MONTO" labelPlacement="outside-left" type="TEXT" size="xs" variant="bordered" />
+            </div>
+            <div key="areaUsuaria" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.areaUsuaria} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, areaUsuaria: e.target.value }); setCamposModificacion({ ...camposModificacion, areaUsuaria: e.target.value }) }} id="AreaUsuariaLabel" label="ÁREA USUARIA" labelPlacement="outside-left" type="text" size="xs" variant="bordered" />
             </div>
           </div>
         </div>
         <Divider orientation="vertical" />
         <div className="w-3/12">
           <div className="w-full flex flex-col gap-4">
-            {JSON.stringify(camposModificacion)}
+            <div key="tipoOrdenServicio" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.tipoOrdenServicioCompra} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, tipoOrdenServicioCompra: e.target.value }); setCamposModificacion({ ...camposModificacion, tipoOrdenServicioCompra: e.target.value }) }} id="tipoOrdenServicioCompraLabel" label="TIPO DE ORDEN: SERVICIO/COMPRA" labelPlacement="outside-left" type="TEXT" size="xs" variant="bordered" />
+            </div>
+            <div key="region" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.region} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, region: e.target.value }); setCamposModificacion({ ...camposModificacion, region: e.target.value }) }} id="region" label="REGIÓN" labelPlacement="outside-left" type="TEXT" size="xs" variant="bordered" />
+            </div>
+            <div key="responsable" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.responsableControlPrevio} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, responsableControlPrevio: e.target.value }); setCamposModificacion({ ...camposModificacion, responsableControlPrevio: e.target.value }) }} id="ResponsableLabel" label="RESPONSABLE" labelPlacement="outside-left" type="TEXT" size="xs" variant="bordered" />
+            </div>
+            <div key="ruc" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.ruc} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, ruc: e.target.value }); setCamposModificacion({ ...camposModificacion, ruc: e.target.value }) }} id="RUCLabel" label="RUC" labelPlacement="outside-left" type="TEXT" size="xs" variant="bordered" />
+            </div>
+            <div key="nroDocumento" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.nroDocumento} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, nroDocumento: e.target.value }); setCamposModificacion({ ...camposModificacion, nroDocumento: e.target.value }) }} id="nroDocumento" label="N° DE DOCUMENTO" labelPlacement="outside-left" type="TEXT" size="xs" variant="bordered" />
+            </div>
+            <div key="comprobante" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+              <Input value={pagoSeleccionado.comprobante} onChange={(e) => { setPagoSeleccionado({ ...pagoSeleccionado, comprobante: e.target.value }); setCamposModificacion({ ...camposModificacion, comprobante: e.target.value }) }} id="comprobante" label="COMPROBANTE" labelPlacement="outside-left" type="TEXT" size="xs" variant="bordered" />
+            </div>
+
           </div>
         </div>
 
         {/* <Divider orientation="vertical"/>
-        <div className="w-3/12">
-          <div className="w-full flex flex-col gap-4">
-            <div key="CUT" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+          <div className="w-3/12">
+            <div className="w-full flex flex-col gap-4">
+              <div key="CUT" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+                <Input id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              </div>
+              <div key="Orden" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+                <Input id="Orden" label="Orden" placeholder="Ingresar Orden" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              </div>
+              <div key="SIAF" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+                <Input id="SIAF" label="SIAF" placeholder="Ingresar SIAF" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              </div>
+              <div key="email" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
+                <Input id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
+              </div>
             </div>
-            <div key="Orden" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input id="Orden" label="Orden" placeholder="Ingresar Orden" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
-            </div>
-            <div key="SIAF" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input id="SIAF" label="SIAF" placeholder="Ingresar SIAF" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
-            </div>
-            <div key="email" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
-              <Input id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
-            </div>
-          </div>
-        </div> */}
+          </div> */}
       </div>
     </>
   );
