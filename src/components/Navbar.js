@@ -1,27 +1,28 @@
 import React from "react";
 import {
-  Navbar, 
-  NavbarBrand, 
-  NavbarContent, 
-  NavbarItem, 
+  Navbar,
+  NavbarBrand,
+  NavbarContent,
+  NavbarItem,
   NavbarMenuToggle,
   NavbarMenu,
-  NavbarMenuItem
+  NavbarMenuItem,
+  Divider
 } from "@nextui-org/react";
-import {Link, Button} from "@nextui-org/react";
+import { Link, Button } from "@nextui-org/react";
 // import {AcmeLogo} from "./AcmeLogo.jsx";
+import logoUEFSA from "../assets/logo.png";
+import { Switch } from "@nextui-org/react";
+import { MoonIcon } from "../assets/MoonIcon";
+import { SunIcon } from "../assets/SunIcon";
 
-export default function App() {
+export default function App({ setNightTheme }) {
   const menuItems = [
-    "Profile",
+    "Perfil",
     "Dashboard",
-    "Activity",
-    "Analytics",
-    "System",
-    "Deployments",
-    "My Settings",
-    "Team Settings",
-    "Help & Feedback",
+    "SIAF",
+    "PAGOS",
+    "Configuraciones",
     "Log Out",
   ];
 
@@ -34,33 +35,63 @@ export default function App() {
       <NavbarContent className="sm:hidden pr-3" justify="center">
         <NavbarBrand>
           {/* <AcmeLogo /> */}
-          <p className="font-bold text-inherit">COPASA</p>
+          <img
+            // onClick={() => goTo("/inicio")}
+            src={logoUEFSA}
+            style={{ cursor: "pointer", width: "70px" }}
+            alt="UEFSA"
+            title="UEFSA"
+          />
+          {/* <p className="font-bold text-inherit">COPASA</p> */}
         </NavbarBrand>
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
+        <Divider orientation="vertical" />
         <NavbarBrand>
           {/* <AcmeLogo /> */}
-          <p className="font-bold text-inherit">COPASA</p>
+          <img
+            // onClick={() => goTo("/inicio")}
+            src={logoUEFSA}
+            style={{ cursor: "pointer", width: "90px" }}
+            alt="UEFSA"
+            title="UEFSA"
+          />
+          {/* <p className="font-bold text-inherit">COPASA</p> */}
         </NavbarBrand>
+        <Divider orientation="vertical" />
         <NavbarItem>
           <Link color="foreground" href="#">
-            Tablero Pagos
+            SIAF
           </Link>
         </NavbarItem>
         <NavbarItem isActive>
           <Link href="#" aria-current="page" color="success">
-            SIAF
+            PAGOS
           </Link>
         </NavbarItem>
-        <NavbarItem>
+        {/* <NavbarItem>
           <Link color="foreground" href="#">
             Integrations
           </Link>
-        </NavbarItem>
+        </NavbarItem> */}
       </NavbarContent>
 
       <NavbarContent justify="end">
+        <Switch
+          defaultSelected
+          size="lg"
+          color="secondary"
+          onValueChange={setNightTheme}
+          thumbIcon={({ isSelected, className }) =>
+            isSelected ? (
+              <MoonIcon className={className} style={{fill:"white"}} />
+            ) : (
+              <SunIcon className={className} />
+            )
+          }
+        >
+        </Switch>
         <NavbarItem className="hidden lg:flex">
           <Link href="#">Login</Link>
         </NavbarItem>

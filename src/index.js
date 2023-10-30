@@ -14,7 +14,7 @@ root.render(
     <BrowserRouter>
       <NextUIProvider>
         {/* <main className=" first-letter:text-foreground bg-background"> */}
-        <main className="dark text-foreground bg-background">
+        <main>
           <App />
         </main>
       </NextUIProvider>

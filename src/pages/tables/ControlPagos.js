@@ -22,12 +22,13 @@ import {
   Skeleton
 } from "@nextui-org/react";
 import { PlusIcon } from "../../assets/PlusIcon";
+import { RefreshIcon } from "../../assets/RefreshIcon";
 import { VerticalDotsIcon } from "../../assets/VerticalDotsIcon";
 import { SearchIcon } from "../../assets/SearchIcon";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { ChevronDownIcon } from "../../assets/ChevronDownIcon";
-import { columns, statusOptions } from "../../data/pagos";
+import { columns, statusOptions, areaUsuariaOptions } from "../../data/pagos";
 import { capitalize } from "../../utils/utils";
 import { Typography } from "@material-tailwind/react";
 import { useSearchParams } from 'react-router-dom';
@@ -110,6 +111,7 @@ function ControlPagos() {
   // const [visibleColumns, setVisibleColumns] = React.useState(new Set(INITIAL_VISIBLE_COLUMNS));
   const [visibleColumns, setVisibleColumns] = React.useState("all");
   const [statusFilter, setStatusFilter] = React.useState("all");
+  const [areasUsuarias, setAreasUsuarias] = React.useState("all");
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [searchParams] = useSearchParams();
   const [sortDescriptor, setSortDescriptor] = React.useState({
@@ -139,12 +141,18 @@ function ControlPagos() {
     }
     if (statusFilter !== "all" && Array.from(statusFilter).length !== statusOptions.length) {
       filteredPagos = filteredPagos.filter((pago) =>
-        Array.from(statusFilter).includes(pago.mes),
+        Array.from(statusFilter).includes(pago.ftefto),
+      );
+    }
+
+    if (areasUsuarias !== "all" && Array.from(areasUsuarias).length !== areaUsuariaOptions.length) {
+      filteredPagos = filteredPagos.filter((pago) =>
+        Array.from(areasUsuarias).includes(pago.areaUsuaria),
       );
     }
 
     return filteredPagos;
-  }, [filterValue, statusFilter, data.content]);
+  }, [filterValue, statusFilter, areasUsuarias, data.content]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -226,7 +234,7 @@ function ControlPagos() {
       case "observacion":
       case "nroDocumento":
         return (
-          <Typography className="whitespace-nowrap" style={{fontSize:"small"}}>
+          <Typography className="whitespace-nowrap" style={{ fontSize: "small" }}>
             {cellValue}
           </Typography>
         );
@@ -301,7 +309,7 @@ function ControlPagos() {
                             size="sm"
                             variant="flat"
                           >
-                            Meses
+                            Fuente de Financiamiento
                           </Button>
                         </DropdownTrigger>
                         <DropdownMenu
@@ -315,6 +323,31 @@ function ControlPagos() {
                           {statusOptions.map((status) => (
                             <DropdownItem key={status.uid} className="capitalize">
                               {capitalize(status.name)}
+                            </DropdownItem>
+                          ))}
+                        </DropdownMenu>
+                      </Dropdown>
+                      <Dropdown>
+                        <DropdownTrigger className="hidden sm:flex">
+                          <Button
+                            endContent={<ChevronDownIcon className="text-small" />}
+                            size="sm"
+                            variant="flat"
+                          >
+                            Área Usuaria
+                          </Button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                          disallowEmptySelection
+                          aria-label="Area Usuaria"
+                          closeOnSelect={false}
+                          selectedKeys={areasUsuarias}
+                          selectionMode="multiple"
+                          onSelectionChange={setAreasUsuarias}
+                        >
+                          {areaUsuariaOptions.map((status) => (
+                            <DropdownItem key={status.uid} className="capitalize">
+                              {status.name}
                             </DropdownItem>
                           ))}
                         </DropdownMenu>
@@ -345,6 +378,13 @@ function ControlPagos() {
                           ))}
                         </DropdownMenu>
                       </Dropdown>
+                      <Button
+                        className="bg-light-blue-800 text-white"
+                        endContent={<RefreshIcon />}
+                        size="sm"
+                      >
+                        Actualizar
+                      </Button>
                       <Button
                         className="bg-foreground text-background"
                         endContent={<PlusIcon />}
@@ -392,6 +432,7 @@ function ControlPagos() {
   }, [
     filterValue,
     statusFilter,
+    areasUsuarias,
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
@@ -541,10 +582,10 @@ function ControlPagos() {
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody  isLoading={isLoading} emptyContent={"Sin pagos encontrados"} items={sortedItems}>
+        <TableBody isLoading={isLoading} emptyContent={"Sin pagos encontrados"} items={sortedItems}>
           {(item) => (
             <TableRow key={item.id} className="cursor-pointer" >
-              {(columnKey) => <TableCell style={{fontSize:"small"}}>{renderCell(item, columnKey)}</TableCell>}
+              {(columnKey) => <TableCell style={{ fontSize: "small" }}>{renderCell(item, columnKey)}</TableCell>}
             </TableRow>
           )}
         </TableBody>
@@ -623,9 +664,10 @@ function ControlPagos() {
           </div>
         </div>
 
-        {/* <Divider orientation="vertical"/>
-          <div className="w-3/12">
-            <div className="w-full flex flex-col gap-4">
+        <Divider orientation="vertical" />
+        <div className="w-3/12">
+          {JSON.stringify(camposModificacion)}
+          {/* <div className="w-full flex flex-col gap-4">
               <div key="CUT" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
                 <Input id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
               </div>
@@ -638,8 +680,8 @@ function ControlPagos() {
               <div key="email" className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-1 gap-4">
                 <Input id="CUT" label="CUT" placeholder="Ingresar cut" labelPlacement="outside-left" type="text" size="xs" variant="primary" />
               </div>
-            </div>
-          </div> */}
+            </div> */}
+        </div>
       </div>
     </>
   );

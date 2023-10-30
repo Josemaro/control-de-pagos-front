@@ -49,20 +49,37 @@ const columns = [
 ];
 
 const statusOptions = [
-	{ name: "Enero", uid: "enero" },
-	{ name: "Febrero", uid: "febrero" },
-	{ name: "Marzo", uid: "marzo" },
-	{ name: "Abril", uid: "abril" },
-	{ name: "Mayo", uid: "mayo" },
-	{ name: "Junio", uid: "junio" },
-	{ name: "Julio", uid: "julio" },
-	{ name: "Agosto", uid: "agosto" },
-	{ name: "Septiembre", uid: "septiembre" },
-	{ name: "Octubre", uid: "octubre" },
-	{ name: "Noviembre", uid: "noviembre" },
-	{ name: "Diciembre", uid: "diciembre" },
+	{ name: "RO", uid: "RO" },
+	{ name: "RD", uid: "RD" }
+];
+
+const areaUsuariaOptions = [
+	{ name: "ABSTEC,", uid: "ABSTEC," },
+	{ name: "DE", uid: "DE" },
+	{ name: "EA", uid: "EA" },
+	{ name: "ET,", uid: "ET," },
+	{ name: "OA", uid: "OA" },
+	{ name: "OA-TIC", uid: "OA-TIC" },
+	{ name: "OGP", uid: "OGP" },
+	{ name: "OPPS", uid: "OPPS" },
 ];
 
 
+// const statusOptions = [
+// 	{ name: "Enero", uid: "enero" },
+// 	{ name: "Febrero", uid: "febrero" },
+// 	{ name: "Marzo", uid: "marzo" },
+// 	{ name: "Abril", uid: "abril" },
+// 	{ name: "Mayo", uid: "mayo" },
+// 	{ name: "Junio", uid: "junio" },
+// 	{ name: "Julio", uid: "julio" },
+// 	{ name: "Agosto", uid: "agosto" },
+// 	{ name: "Septiembre", uid: "septiembre" },
+// 	{ name: "Octubre", uid: "octubre" },
+// 	{ name: "Noviembre", uid: "noviembre" },
+// 	{ name: "Diciembre", uid: "diciembre" },
+// ];
 
-export { columns, statusOptions };
+
+
+export { columns, statusOptions , areaUsuariaOptions};
