@@ -22,7 +22,7 @@ export default function LoginModal({ setUsuario, usuario }) {
 
   return (
     <>
-      <Button onPress={onOpen} color="primary">Iniciar sesión</Button>
+      <Button onPress={onOpen} color="secondary" variant="flat">Login</Button>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -45,7 +45,7 @@ export default function LoginModal({ setUsuario, usuario }) {
                   placeholder="Ingresa tu usuario o correo"
                   variant="bordered"
                   // value={campoCorreo}
-                  onChange={(e)=>{setCampoCorreo(e.target.value)}}
+                  onChange={(e) => { setCampoCorreo(e.target.value) }}
                 />
                 <Input
                   endContent={
@@ -69,19 +69,20 @@ export default function LoginModal({ setUsuario, usuario }) {
                     classNames={{
                       label: "text-small",
                     }}
-                  >
+                    color="secondary"                    
+                    >
                     Recuérdame
                   </Checkbox>
-                  <Link color="primary" href="#" size="sm">
+                  <Link color="secondary" href="#" size="sm">
                     ¿Olvidaste tu contraseña?
                   </Link>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onPress={onClose}>
+                <Button color="danger" variant="bordered" onPress={onClose}>
                   Cancelar
                 </Button>
-                <Button color="primary" onPress={handleClose}>
+                <Button color="secondary" onPress={handleClose}>
                   Ingresar
                 </Button>
               </ModalFooter>

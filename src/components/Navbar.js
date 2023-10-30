@@ -15,8 +15,9 @@ import logoUEFSA from "../assets/logo.png";
 import { Switch } from "@nextui-org/react";
 import { MoonIcon } from "../assets/MoonIcon";
 import { SunIcon } from "../assets/SunIcon";
+import LoginModal from "./LoginModal";
 
-export default function App({ setNightTheme }) {
+export default function App({ setNightTheme, setUsuario, usuario }) {
   const menuItems = [
     "Perfil",
     "Dashboard",
@@ -47,7 +48,7 @@ export default function App({ setNightTheme }) {
       </NavbarContent>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <Divider orientation="vertical" />
+        {/* <Divider orientation="vertical" /> */}
         <NavbarBrand>
           {/* <AcmeLogo /> */}
           <img
@@ -59,7 +60,7 @@ export default function App({ setNightTheme }) {
           />
           {/* <p className="font-bold text-inherit">COPASA</p> */}
         </NavbarBrand>
-        <Divider orientation="vertical" />
+        {/* <Divider orientation="vertical" /> */}
         <NavbarItem>
           <Link color="foreground" href="#">
             SIAF
@@ -85,20 +86,27 @@ export default function App({ setNightTheme }) {
           onValueChange={setNightTheme}
           thumbIcon={({ isSelected, className }) =>
             isSelected ? (
-              <MoonIcon className={className} style={{fill:"white"}} />
+              <MoonIcon className={className} />
             ) : (
               <SunIcon className={className} />
             )
           }
         >
         </Switch>
-        <NavbarItem className="hidden lg:flex">
+        {/* <NavbarItem className="hidden lg:flex">
           <Link href="#">Login</Link>
-        </NavbarItem>
+        </NavbarItem> */}
         <NavbarItem>
-          <Button as={Link} color="warning" href="#" variant="flat">
-            Sign Up
-          </Button>
+          {/* <Button as={Link} color="secondary" variant="flat" href="#">
+            Login
+            
+          //TODO INICIO CIERRE SESIÓN
+          </Button> */}
+          {usuario == "" ?
+            (<LoginModal setUsuario={setUsuario} usuario={usuario} />
+            ) : (<div onClick={()=>{setUsuario("")}}>Bienvenido {usuario}</div>)
+          }
+          {/* <LoginModal setUsuario={setUsuario} usuario={usuario} /> */}
         </NavbarItem>
       </NavbarContent>
 
