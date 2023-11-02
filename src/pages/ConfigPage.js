@@ -1,10 +1,8 @@
-import UserTable from "../components/UserTable";
 
 function ConfigPage() {
     return (
         <>
             ConfigPage
-            <UserTable></UserTable>
         </>
     );
 }
