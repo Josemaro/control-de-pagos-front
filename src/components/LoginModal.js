@@ -6,19 +6,16 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDi
 import { EyeFilledIcon } from "../assets/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../assets/EyeSlashFilledIcon";
 
-
-export default function LoginModal({ setUsuario, usuario }) {
+export default function LoginModal({ setUsuario, usuario, setCampoCorreo, setCampoPassword, actualizarDatos}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [campoCorreo, setCampoCorreo] = useState("");
-  const [campoPassword, setCampoPassword] = useState("");
+
   const [isVisible, setIsVisible] = React.useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   const handleClose = () => {
-    setUsuario(campoCorreo);
+    actualizarDatos({});
   }
-
 
   return (
     <>
@@ -38,14 +35,16 @@ export default function LoginModal({ setUsuario, usuario }) {
                 <Input
                   autoFocus
                   isClearable
+                  id="labelEmail"
                   // endContent={
                   //   <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
                   // }
-                  label="Usuario o correo"
-                  placeholder="Ingresa tu usuario o correo"
+                  label="Correo"
+                  placeholder="Ingresa tu correo"
                   variant="bordered"
                   // value={campoCorreo}
-                  onChange={(e) => { setCampoCorreo(e.target.value) }}
+                  type="email"
+                  onValueChange={setCampoCorreo}
                 />
                 <Input
                   endContent={
@@ -57,6 +56,7 @@ export default function LoginModal({ setUsuario, usuario }) {
                       )}
                     </button>
                   }
+                  id="labelPassword"
                   label="Contraseña"
                   placeholder="Ingresa tu contraseña"
                   type={isVisible ? "text" : "password"}
@@ -64,7 +64,7 @@ export default function LoginModal({ setUsuario, usuario }) {
                   // value={campoPassword}
                   onValueChange={setCampoPassword}
                 />
-                <div className="flex py-2 px-1 justify-between">
+                {/* <div className="flex py-2 px-1 justify-between">
                   <Checkbox
                     classNames={{
                       label: "text-small",
@@ -76,13 +76,13 @@ export default function LoginModal({ setUsuario, usuario }) {
                   <Link color="secondary" href="#" size="sm">
                     ¿Olvidaste tu contraseña?
                   </Link>
-                </div>
+                </div> */}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="bordered" onPress={onClose}>
                   Cancelar
                 </Button>
-                <Button color="secondary" onPress={handleClose}>
+                <Button color="secondary" onPress={actualizarDatos}>
                   Ingresar
                 </Button>
               </ModalFooter>

@@ -9,14 +9,67 @@ import ConfigPage from './pages/ConfigPage';
 import NavbarUefsa from './components/Navbar';
 import UserProfilePage from './pages/UserProfilePage';
 import { Card } from "@material-tailwind/react";
-import { useState } from 'react';
+import axios from "axios";
+import { useEffect, useState } from 'react';
+const baseURL = process.env.REACT_APP_HOST;
 function App() {
-  const [usuario, setUsuario] = useState("");
+  const [usuario, setUsuario] = useState(null);
   const [nightTheme, setNightTheme] = useState(true);
+  const [campoCorreo, setCampoCorreo] = useState("");
+  const [campoPassword, setCampoPassword] = useState("");
+
+  useEffect(() => {
+    let html = document.getElementById("html");
+
+    if (nightTheme) {
+      html.style.backgroundColor = "black";
+    } else {
+      html.style.backgroundColor = "white";
+    }
+  }, [nightTheme])
+
+  useEffect(() => {
+    console.log("entra")
+    if(usuario==null && JSON.stringify(localStorage.getItem("user")).id!=0){
+      console.log("entra2")
+      setUsuario(JSON.parse(localStorage.getItem("user")));
+    }
+  }, [])
+
+  const actualizarDatos = () => {
+    if (campoCorreo != "" && campoPassword != "") {
+      axios.post(baseURL + "/login", { email: campoCorreo, password: campoPassword })
+        .then(response => {
+          if (response.data?.id) {
+            setUsuario(response.data);
+            localStorage.setItem("user", JSON.stringify(response.data))
+            setCampoPassword("");
+            setCampoCorreo("");
+          } else {
+            //TODO alerta 
+          }
+
+        })
+        .catch(error => {
+          console.error('Error al obtener los datos:', error);
+        });
+
+    }
+  }
+  // useEffect(() => {
+  //   let user = localStorage.getItem("user");
+  //   if (user) {
+  //     // setUsuario(user);
+  //     // console.log(usuario)
+  //   }
+  // }, [usuario])
+
   return (
     <>
       <div className={nightTheme ? "dark text-foreground bg-background" : ""}>
-        <NavbarUefsa setNightTheme={setNightTheme} setUsuario={setUsuario} usuario={usuario} />
+        <NavbarUefsa setNightTheme={setNightTheme} setUsuario={setUsuario} usuario={usuario}
+          setCampoCorreo={setCampoCorreo} setCampoPassword={setCampoPassword} actualizarDatos={actualizarDatos}
+        />
         <div className='flex flex-row gap-2 overflow-x-hidden'>
           {/* <SidebarWithContentSeparator setUsuario={setUsuario} usuario={usuario} /> */}
           {/* <div className='flex w-2/12 min-w-[15%] max-w-[15%]'>

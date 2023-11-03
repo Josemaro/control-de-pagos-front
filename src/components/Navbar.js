@@ -1,5 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
+  Avatar,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
   Navbar,
   NavbarBrand,
   NavbarContent,
@@ -17,7 +22,7 @@ import { MoonIcon } from "../assets/MoonIcon";
 import { SunIcon } from "../assets/SunIcon";
 import LoginModal from "./LoginModal";
 
-export default function App({ setNightTheme, setUsuario, usuario }) {
+export default function App({ setNightTheme, setUsuario, usuario, setCampoPassword, setCampoCorreo, actualizarDatos }) {
   const menuItems = [
     "Perfil",
     "Dashboard",
@@ -102,11 +107,40 @@ export default function App({ setNightTheme, setUsuario, usuario }) {
             
           //TODO INICIO CIERRE SESIÓN
           </Button> */}
-          {usuario == "" ?
-            (<LoginModal setUsuario={setUsuario} usuario={usuario} />
-            ) : (<div onClick={()=>{setUsuario("")}}>Bienvenido {usuario}</div>)
+          {usuario == null ?
+            (<LoginModal actualizarDatos={actualizarDatos} setCampoPassword={setCampoPassword} setCampoCorreo={setCampoCorreo} setUsuario={setUsuario} usuario={usuario} />
+            ) : (
+              // <div onClick={()=>{setUsuario("")}}>Bienvenido {usuario}</div>
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <Avatar
+                    isBordered
+                    as="button"
+                    className="transition-transform"
+                    color="secondary"
+                    name="Jason Hughes"
+                    size="sm"
+                    src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                  />
+                </DropdownTrigger>
+                <DropdownMenu aria-label="Profile Actions" variant="flat">
+                  <DropdownItem key="profile" className="h-14 gap-2">
+                    <p className="font-semibold">Conectado como {usuario?.nombres}</p>
+                    <p className="font-semibold">{usuario?.email}</p>
+                  </DropdownItem>
+                  <DropdownItem key="settings">My Settings</DropdownItem>
+                  <DropdownItem key="team_settings">Team Settings</DropdownItem>
+                  <DropdownItem key="analytics">Analytics</DropdownItem>
+                  <DropdownItem key="system">System</DropdownItem>
+                  <DropdownItem key="configurations">Configurations</DropdownItem>
+                  <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+                  <DropdownItem onClick={() => { setUsuario(null); localStorage.removeItem("user") }} key="logout" color="danger">
+                    Log Out
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
+            )
           }
-          {/* <LoginModal setUsuario={setUsuario} usuario={usuario} /> */}
         </NavbarItem>
       </NavbarContent>
 

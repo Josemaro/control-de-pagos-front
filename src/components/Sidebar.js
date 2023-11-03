@@ -1,6 +1,7 @@
 import React from "react";
 import logoUEFSA from "../assets/logo.png";
 import { useNavigate, useLocation } from "react-router-dom";
+import {Navbar, NavbarBrand, NavbarContent, NavbarItem, Link, DropdownItem, DropdownTrigger, Dropdown, DropdownMenu, Avatar} from "@nextui-org/react";
 import LoginModal from "./LoginModal"
 import {
   Card,
@@ -53,9 +54,13 @@ export default function SidebarWithContentSeparator({ setUsuario, usuario }) {
       {usuario == "" ?
         (<div className="flex items-center justify-center mb-4">
           <LoginModal setUsuario={setUsuario} usuario={usuario} />
-        </div>) : (<div className="ml-5 mb-4 mt-3"><Typography variant="paragraph" color="black" className="saludoUsuario">
+        </div>) : (
+        <div className="ml-5 mb-4 mt-3">
+
+        {/* <Typography variant="paragraph" color="black" className="saludoUsuario">
           Bienvenido {usuario}
-        </Typography></div>)
+        </Typography> */}
+        </div>)
       }
 
 
