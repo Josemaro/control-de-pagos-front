@@ -22,7 +22,7 @@ import { MoonIcon } from "../assets/MoonIcon";
 import { SunIcon } from "../assets/SunIcon";
 import LoginModal from "./LoginModal";
 
-export default function App({ setNightTheme, setUsuario, usuario, setCampoPassword, setCampoCorreo, actualizarDatos }) {
+export default function App({ campoCorreo, campoPassword, setCampoRespuesta, campoRespuesta,setNightTheme, setUsuario, usuario, setCampoPassword, setCampoCorreo, actualizarDatos }) {
   const menuItems = [
     "Perfil",
     "Dashboard",
@@ -85,7 +85,6 @@ export default function App({ setNightTheme, setUsuario, usuario, setCampoPasswo
 
       <NavbarContent justify="end">
         <Switch
-          defaultSelected
           size="lg"
           color="secondary"
           onValueChange={setNightTheme}
@@ -108,7 +107,7 @@ export default function App({ setNightTheme, setUsuario, usuario, setCampoPasswo
           //TODO INICIO CIERRE SESIÓN
           </Button> */}
           {usuario == null ?
-            (<LoginModal actualizarDatos={actualizarDatos} setCampoPassword={setCampoPassword} setCampoCorreo={setCampoCorreo} setUsuario={setUsuario} usuario={usuario} />
+            (<LoginModal campoRespuesta={campoRespuesta} setCampoRespuesta={setCampoRespuesta} campoCorreo={campoCorreo} campoPassword={campoPassword} actualizarDatos={actualizarDatos} setCampoPassword={setCampoPassword} setCampoCorreo={setCampoCorreo} setUsuario={setUsuario} usuario={usuario} />
             ) : (
               // <div onClick={()=>{setUsuario("")}}>Bienvenido {usuario}</div>
               <Dropdown placement="bottom-end">
@@ -118,24 +117,20 @@ export default function App({ setNightTheme, setUsuario, usuario, setCampoPasswo
                     as="button"
                     className="transition-transform"
                     color="secondary"
-                    name="Jason Hughes"
+                    name={usuario.nombres}
                     size="sm"
-                    src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                    src=""
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
                   <DropdownItem key="profile" className="h-14 gap-2">
-                    <p className="font-semibold">Conectado como {usuario?.nombres}</p>
+                    <p className="font-semibold">Hola, {usuario?.nombres}</p>
                     <p className="font-semibold">{usuario?.email}</p>
                   </DropdownItem>
-                  <DropdownItem key="settings">My Settings</DropdownItem>
-                  <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                  <DropdownItem key="analytics">Analytics</DropdownItem>
-                  <DropdownItem key="system">System</DropdownItem>
-                  <DropdownItem key="configurations">Configurations</DropdownItem>
-                  <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
+                  <DropdownItem key="settings">Ajustes</DropdownItem>
+                  <DropdownItem key="configurations">Configuración</DropdownItem>
                   <DropdownItem onClick={() => { setUsuario(null); localStorage.removeItem("user") }} key="logout" color="danger">
-                    Log Out
+                    Cerrar sesión
                   </DropdownItem>
                 </DropdownMenu>
               </Dropdown>
@@ -145,7 +140,7 @@ export default function App({ setNightTheme, setUsuario, usuario, setCampoPasswo
       </NavbarContent>
 
       <NavbarMenu>
-        {menuItems.map((item, index) => (
+        {menuItems.map((item, index) => ( 
           <NavbarMenuItem key={`${item}-${index}`}>
             <Link
               className="w-full"

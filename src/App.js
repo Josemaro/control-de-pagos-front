@@ -14,9 +14,10 @@ import { useEffect, useState } from 'react';
 const baseURL = process.env.REACT_APP_HOST;
 function App() {
   const [usuario, setUsuario] = useState(null);
-  const [nightTheme, setNightTheme] = useState(true);
+  const [nightTheme, setNightTheme] = useState(false);
   const [campoCorreo, setCampoCorreo] = useState("");
   const [campoPassword, setCampoPassword] = useState("");
+  const [campoRespuesta, setCampoRespuesta] = useState("");
 
   useEffect(() => {
     let html = document.getElementById("html");
@@ -40,15 +41,15 @@ function App() {
     if (campoCorreo != "" && campoPassword != "") {
       axios.post(baseURL + "/login", { email: campoCorreo, password: campoPassword })
         .then(response => {
-          if (response.data?.id) {
-            setUsuario(response.data);
-            localStorage.setItem("user", JSON.stringify(response.data))
+          if (response.data?.usuario?.id) {
+            setUsuario(response.data.usuario);
+            localStorage.setItem("user", JSON.stringify(response.data.usuario))
             setCampoPassword("");
             setCampoCorreo("");
           } else {
             //TODO alerta 
+            setCampoRespuesta(response.data.msg);
           }
-
         })
         .catch(error => {
           console.error('Error al obtener los datos:', error);
@@ -68,7 +69,11 @@ function App() {
     <>
       <div className={nightTheme ? "dark text-foreground bg-background" : ""}>
         <NavbarUefsa setNightTheme={setNightTheme} setUsuario={setUsuario} usuario={usuario}
-          setCampoCorreo={setCampoCorreo} setCampoPassword={setCampoPassword} actualizarDatos={actualizarDatos}
+          setCampoCorreo={setCampoCorreo} setCampoPassword={setCampoPassword} 
+          campoCorreo={campoCorreo} campoPassword={campoPassword}
+          actualizarDatos={actualizarDatos}
+          campoRespuesta={campoRespuesta}
+          setCampoRespuesta={setCampoRespuesta}
         />
         <div className='flex flex-row gap-2 overflow-x-hidden'>
           {/* <SidebarWithContentSeparator setUsuario={setUsuario} usuario={usuario} /> */}
