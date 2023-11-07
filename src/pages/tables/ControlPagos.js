@@ -32,6 +32,7 @@ import { columns, statusOptions, areaUsuariaOptions } from "../../data/pagos";
 import { capitalize } from "../../utils/utils";
 import { Typography } from "@material-tailwind/react";
 import { useSearchParams } from 'react-router-dom';
+import PagoFormModal from "../../components/PagoFormModal";
 
 
 const statusColorMap = {
@@ -354,7 +355,7 @@ function ControlPagos() {
                           ))}
                         </DropdownMenu>
                       </Dropdown>
-                      <Dropdown shouldBlockScroll={false}>
+                      <Dropdown shouldBlockScroll={false} >
                         <DropdownTrigger className="hidden sm:flex">
                           <Button
                             endContent={<ChevronDownIcon className="text-small" />}
@@ -388,13 +389,14 @@ function ControlPagos() {
                       >
                         Actualizar
                       </Button>
-                      <Button
+                      {/* <Button
                         className="bg-foreground text-background"
                         endContent={<PlusIcon />}
                         size="sm"
                       >
                         Registrar
-                      </Button>
+                      </Button> */}
+                      <PagoFormModal/>
                     </div>
                     {/*                    
                     <div className="flex flex-col gap-2">
